@@ -1,4 +1,5 @@
 import cookieParser from 'cookie-parser';
+import { connect, connection } from 'mongoose';
 import morgan from 'morgan';
 import path from 'path';
 import helmet from 'helmet';
@@ -14,6 +15,14 @@ import { cookieProps } from '@shared/constants';
 const app = express();
 const { BAD_REQUEST } = StatusCodes;
 
+connect(process.env.DATABASE_URL as string, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
+
+const db = connection;
+db.on('error', (error) => console.error(error));
+db.once('open', () => console.log('Connected to database'));
 
 
 /************************************************************************************
