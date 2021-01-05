@@ -1,14 +1,14 @@
 import { Document, model, Schema } from 'mongoose';
 
-export enum UserRoles {
-    Standard,
-    Admin,
-}
+// export enum UserRoles {
+//     Standard,
+//     Admin,
+// }
 
 export interface IUser extends Document {
-    name: string;
-    email: string;
+    username: string;
     pwdHash: string;
+    email: string;
 }
 
 const userSchema: Schema = new Schema(

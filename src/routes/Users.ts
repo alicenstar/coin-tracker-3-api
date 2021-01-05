@@ -1,11 +1,13 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
 
-import UserDao from '@daos/User/UserDao.mock';
+// import UserDao from '@daos/User/UserDao.mock';
 import { paramMissingError, IRequest } from '@shared/constants';
+import User, { IUser } from '@entities/User';
+// import { userInfo } from 'os';
 
 const router = Router();
-const userDao = new UserDao();
+// const userDao = new UserDao();
 const { BAD_REQUEST, CREATED, OK } = StatusCodes;
 
 
@@ -15,8 +17,17 @@ const { BAD_REQUEST, CREATED, OK } = StatusCodes;
  ******************************************************************************/
 
 router.get('/all', async (req: Request, res: Response) => {
-    const users = await userDao.getAll();
-    return res.status(OK).json({users});
+    // const users = await userDao.getAll();
+    // return res.status(OK).json({users});
+
+    try {
+        const users: IUser[] = await User.find();
+        res.status(OK).json({ users });
+    } catch (err) {
+        res.status(500).json({
+            message: err.message,
+        });
+    }
 });
 
 
@@ -26,14 +37,29 @@ router.get('/all', async (req: Request, res: Response) => {
  ******************************************************************************/
 
 router.post('/add', async (req: IRequest, res: Response) => {
-    const { user } = req.body;
-    if (!user) {
-        return res.status(BAD_REQUEST).json({
-            error: paramMissingError,
+    try {
+        const body = req.body;
+        const user: IUser = new User({
+            username: body.user.username,
+            password: body.user.pwdHash,
+            email: body.email,
         });
+        const newUser: IUser = await user.save();
+        res.status(CREATED).json({
+            message: 'User added',
+            user: newUser
+        });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
     }
-    await userDao.add(user);
-    return res.status(CREATED).end();
+    // const { user } = req.body;
+    // if (!user) {
+    //     return res.status(BAD_REQUEST).json({
+    //         error: paramMissingError,
+    //     });
+    // }
+    // await userDao.add(user);
+    // return res.status(CREATED).end();
 });
 
 
@@ -42,16 +68,23 @@ router.post('/add', async (req: IRequest, res: Response) => {
  *                       Update - "PUT /api/users/update"
  ******************************************************************************/
 
-router.put('/update', async (req: IRequest, res: Response) => {
-    const { user } = req.body;
-    if (!user) {
-        return res.status(BAD_REQUEST).json({
-            error: paramMissingError,
-        });
+router.patch('/update', async (req: IRequest, res: Response) => {
+    // const { user } = req.body;
+    // if (!user) {
+    //     return res.status(BAD_REQUEST).json({
+    //         error: paramMissingError,
+    //     });
+    // }
+    // user.id = Number(user.id);
+    // await userDao.update(user);
+    // return res.status(OK).end();
+
+    try {
+        const updatedUser = await User.findByIdAndUpdate(req.body.user.id, req.body.user)
+        res.status(OK).json(updatedUser);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
     }
-    user.id = Number(user.id);
-    await userDao.update(user);
-    return res.status(OK).end();
 });
 
 
@@ -62,8 +95,15 @@ router.put('/update', async (req: IRequest, res: Response) => {
 
 router.delete('/delete/:id', async (req: IRequest, res: Response) => {
     const { id } = req.params;
-    await userDao.delete(Number(id));
-    return res.status(OK).end();
+    // await userDao.delete(Number(id));
+    // return res.status(OK).end();
+
+    try {
+        await User.findByIdAndDelete(id);
+        res.status(OK).json({ message: 'Deleted user' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
 

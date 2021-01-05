@@ -1,7 +1,7 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
 
-import { UserRoles } from '@entities/User';
+// import { UserRoles } from '@entities/User';
 import { cookieProps } from '@shared/constants';
 import { JwtService } from '@shared/JwtService';
 
@@ -21,7 +21,7 @@ export const adminMW = async (req: Request, res: Response, next: NextFunction) =
         }
         // Make sure user role is an admin
         const clientData = await jwtService.decodeJwt(jwt);
-        if (clientData.role === UserRoles.Admin) {
+        if (clientData.username === 'ayelai') {
             res.locals.userId = clientData.id;
             next();
         } else {

@@ -7,7 +7,7 @@ import { cookieProps } from '@shared/constants';
 
 interface IClientData {
     id: number;
-    role: number;
+    username: string;
 }
 
 interface IOptions {
