@@ -48,10 +48,10 @@ router.get('/:id', async (req: Request, res: Response) => {
 })
 
 /******************************************************************************
- *                       Add One - "POST /api/users/add"
+ *                       Add A User - "POST /api/users/add"
  ******************************************************************************/
 
-router.post('/add', async (req: IRequest, res: Response) => {
+router.post('/add', async (req: Request, res: Response) => {
     try {
         const body = req.body;
         const user: IUser = new User({
@@ -80,10 +80,10 @@ router.post('/add', async (req: IRequest, res: Response) => {
 
 
 /******************************************************************************
- *                       Update - "PUT /api/users/update"
+ *                       Update A User - "PUT /api/users/update"
  ******************************************************************************/
 
-router.patch('/update', async (req: IRequest, res: Response) => {
+router.patch('/update', async (req: Request, res: Response) => {
     // const { user } = req.body;
     // if (!user) {
     //     return res.status(BAD_REQUEST).json({
@@ -105,10 +105,10 @@ router.patch('/update', async (req: IRequest, res: Response) => {
 
 
 /******************************************************************************
- *                    Delete - "DELETE /api/users/delete/:id"
+ *                    Delete A User - "DELETE /api/users/delete/:id"
  ******************************************************************************/
 
-router.delete('/delete/:id', async (req: IRequest, res: Response) => {
+router.delete('/delete/:id', async (req: Request, res: Response) => {
     // const { id } = req.params;
     // await userDao.delete(Number(id));
     // return res.status(OK).end();

@@ -33,6 +33,9 @@ router.get('/latest', async (req: Request, res: Response) => {
     }
 });
 
+/******************************************************************************
+ *                      Get Latest Quotes - "GET /api/cmc/quotes"
+ ******************************************************************************/
 
 router.get('/quotes', async (req: Request, res: Response) => {
     const requestOptions = {
@@ -44,7 +47,7 @@ router.get('/quotes', async (req: Request, res: Response) => {
     const { queryParams } = req.body;
     try {
         const response = await fetch(
-            `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${queryParams}`,
+            `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?${queryParams}`,
             requestOptions
         );
         const json = await response.json();
