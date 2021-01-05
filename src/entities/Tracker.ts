@@ -15,15 +15,15 @@ const trackerSchema: Schema = new Schema(
             type: String,
             required: [true, 'URL is required'],
         },
-        trackerName: String,
+        name: String,
         owner: {
             type: Schema.Types.ObjectId,
-            ref: 'User'
+            ref: 'User',
         },
         holdings: {
             type: Schema.Types.ObjectId,
-            ref: 'Holding'
-        }
+            ref: 'Holding',
+        },
     },
     {
         timestamps: true,

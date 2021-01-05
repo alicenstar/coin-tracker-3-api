@@ -1,4 +1,5 @@
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import { connect, connection } from 'mongoose';
 import morgan from 'morgan';
 import path from 'path';
@@ -29,6 +30,7 @@ db.once('open', () => console.log('Connected to database'));
  *                              Set basic express settings
  ***********************************************************************************/
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser(cookieProps.secret));

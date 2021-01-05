@@ -1,4 +1,5 @@
 import { Document, model, Schema } from 'mongoose';
+import { ITracker } from './Tracker';
 
 // export enum UserRoles {
 //     Standard,
@@ -9,6 +10,7 @@ export interface IUser extends Document {
     username: string;
     pwdHash: string;
     email: string;
+    trackers?: ITracker | ITracker[];
 }
 
 const userSchema: Schema = new Schema(
@@ -28,6 +30,10 @@ const userSchema: Schema = new Schema(
         email: {
             type: String,
             required: [true, 'Email is required'],
+        },
+        trackers: {
+            type: Schema.Types.ObjectId,
+            ref: 'Tracker',
         },
     },
     {

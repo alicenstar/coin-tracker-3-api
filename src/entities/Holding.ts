@@ -26,7 +26,7 @@ const holdingSchema: Schema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Tracker',
             required: [true, 'Tracker is required'],
-        }
+        },
     },
     {
         timestamps: true,

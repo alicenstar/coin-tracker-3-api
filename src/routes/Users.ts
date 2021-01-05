@@ -30,7 +30,22 @@ router.get('/all', async (req: Request, res: Response) => {
     }
 });
 
+/******************************************************************************
+ *                      Get One User - "GET /api/users/:id"
+ ******************************************************************************/
 
+router.get('/:id', async (req: Request, res: Response) => {
+    let user: IUser | null;
+    try {
+        user = await User.findById(req.params.id);
+        if (user == null) {
+            return res.status(404).json({ message: 'Cannot find user' });
+        }
+        return res.status(OK).json({ user });
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+})
 
 /******************************************************************************
  *                       Add One - "POST /api/users/add"
@@ -94,12 +109,12 @@ router.patch('/update', async (req: IRequest, res: Response) => {
  ******************************************************************************/
 
 router.delete('/delete/:id', async (req: IRequest, res: Response) => {
-    const { id } = req.params;
+    // const { id } = req.params;
     // await userDao.delete(Number(id));
     // return res.status(OK).end();
 
     try {
-        await User.findByIdAndDelete(id);
+        await User.findByIdAndDelete(req.params.id);
         res.status(OK).json({ message: 'Deleted user' });
     } catch (err) {
         res.status(500).json({ message: err.message });
