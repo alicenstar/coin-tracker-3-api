@@ -52,11 +52,16 @@ router.get('/:id', async (req: Request, res: Response) => {
  ******************************************************************************/
 
 router.post('/add', async (req: Request, res: Response) => {
+    const body = req.body;
+    let user: IUser | null;
     try {
-        const body = req.body;
-        const user: IUser = new User({
-            username: body.user.username,
-            password: body.user.pwdHash,
+        user = await User.findOne({ email: body.email });
+        if (user != null) {
+            return res.status(404).json({ message: 'Email already exists' });
+        }
+        user = new User({
+            username: body.username,
+            pwdHash: body.pwdHash,
             email: body.email,
         });
         const newUser: IUser = await user.save();
@@ -95,7 +100,10 @@ router.patch('/update', async (req: Request, res: Response) => {
     // return res.status(OK).end();
 
     try {
-        const updatedUser = await User.findByIdAndUpdate(req.body.user.id, req.body.user)
+        const updatedUser = await User.findByIdAndUpdate(
+            req.body.user.id,
+            req.body.user
+        );
         res.status(OK).json(updatedUser);
     } catch (err) {
         res.status(400).json({ message: err.message });

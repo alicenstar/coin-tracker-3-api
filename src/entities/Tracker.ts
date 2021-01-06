@@ -3,19 +3,17 @@ import { IHolding } from './Holding';
 import { IUser } from './User';
 
 export interface ITracker extends Document {
-    url: string;
-    name?: string;
+    name: string;
     owner?: IUser;
     holdings?: IHolding[];
 }
 
 const trackerSchema: Schema = new Schema(
     {
-        url: {
+        name: {
             type: String,
-            required: [true, 'URL is required'],
+            required: [true, 'Tracker name is required'],
         },
-        name: String,
         owner: {
             type: Schema.Types.ObjectId,
             ref: 'User',

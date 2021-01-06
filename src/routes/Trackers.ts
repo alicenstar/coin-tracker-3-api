@@ -16,10 +16,12 @@ router.post('/add', async (req: Request, res: Response) => {
     try {
         const body = req.body;
         const tracker: ITracker = new Tracker({
-            url: body.tracker.url,
-            name: body.tracker.name,
-            owner: body.tracker.owner
+            name: body.tracker.name
         });
+        if (body.tracker.owner) {
+            tracker.owner = body.tracker.owner;
+        }
+        // if body.tracker.owner, tracker.owner = ''
         const newTracker: ITracker = await tracker.save();
         res.status(CREATED).json({
             message: 'Tracker added',
@@ -74,3 +76,9 @@ router.delete('/delete/:id', async (req: Request, res: Response) => {
         res.status(500).json({ message: err.message });
     }
 });
+
+/******************************************************************************
+ *                                     Export
+ ******************************************************************************/
+
+export default router;
