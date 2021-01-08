@@ -19,6 +19,7 @@ router.post('/add', async (req: Request, res: Response) => {
             ticker: body.holding.ticker,
             name: body.holding.name,
             quantity: body.holding.quantity,
+            USDPriceAtPurchase: body.holding.priceAtPurchase,
             tracker: body.holding.tracker
         });
         const newHolding: IHolding = await holding.save();

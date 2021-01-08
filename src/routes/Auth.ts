@@ -20,34 +20,26 @@ const { BAD_REQUEST, OK, UNAUTHORIZED, NOT_FOUND } = StatusCodes;
 
 router.post('/login', async (req: IRequest, res: Response) => {
     // Check email and password present
-    const { email, password } = req.body;
-    if (!(email && password)) {
+    const { email, pwdHash } = req.body;
+    if (!(email && pwdHash)) {
         return res.status(BAD_REQUEST).json({
             error: paramMissingError,
         });
     }
     
     // Fetch user
-
-    // const user = await userDao.getOne(email);
     let user: IUser | null;
     try {
         user = await User.findOne({ 'email': email });
         if (user == null) {
-            return res.status(NOT_FOUND).json({ message: loginFailedErr });
+            return res.status(UNAUTHORIZED).json({ error: loginFailedErr });
         }
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
-
-    // if (!user) {
-    //     return res.status(UNAUTHORIZED).json({
-    //         error: loginFailedErr,
-    //     });
-    // }
     
     // Check password
-    const pwdPassed = await bcrypt.compare(password, user.pwdHash);
+    const pwdPassed = await bcrypt.compare(pwdHash, user.pwdHash);
     if (!pwdPassed) {
         return res.status(UNAUTHORIZED).json({
             error: loginFailedErr,

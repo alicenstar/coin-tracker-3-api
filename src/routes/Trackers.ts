@@ -16,14 +16,13 @@ router.post('/add', async (req: Request, res: Response) => {
     try {
         const body = req.body;
         const tracker: ITracker = new Tracker({
-            name: body.tracker.name
+            name: body.newTrackerName
         });
-        if (body.tracker.owner) {
-            tracker.owner = body.tracker.owner;
+        if (body.owner) {
+            tracker.owner = body.owner;
         }
-        // if body.tracker.owner, tracker.owner = ''
         const newTracker: ITracker = await tracker.save();
-        res.status(CREATED).json({
+        return res.status(CREATED).json({
             message: 'Tracker added',
             tracker: newTracker
         });

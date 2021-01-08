@@ -29,6 +29,6 @@ export interface IRequest extends Request {
     body: {
         user: IUser;
         email: string;
-        password: string;
+        pwdHash: string;
     }
 } 

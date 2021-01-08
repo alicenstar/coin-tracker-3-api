@@ -22,6 +22,10 @@ const holdingSchema: Schema = new Schema(
             type: Number,
             required: [true, 'Quantity is required'],
         },
+        USDPriceAtPurchase: {
+            type: Schema.Types.Decimal128,
+            required: [true, 'USD price at purchase is required']
+        },
         tracker: {
             type: Schema.Types.ObjectId,
             ref: 'Tracker',
