@@ -3,30 +3,30 @@ import { Request, Response, Router } from 'express';
 
 import Holding, { IHolding } from '@entities/Holding';
 import Transaction, { ITransaction } from '@entities/Transaction';
+import Tracker from '@entities/Tracker';
 
 const router = Router();
-const { BAD_REQUEST, CREATED, OK } = StatusCodes;
+const { CREATED, OK } = StatusCodes;
 
 
 
 /******************************************************************************
- *                       Buy/Sell A Holding - "POST /api/holdings/new"
+ *                       Buy/Sell A Holding - "POST /api/holdings/add"
  ******************************************************************************/
 
-router.post('/new', async (req: Request, res: Response) => {
+router.post('/add', async (req: Request, res: Response) => {
     try {
         const body = req.body;
-
         // Check if user already holds that coin
-        const coin = await Holding.findOne({ coinId: body.transaction.coinId });
-        if (coin) {
-            if (body.transaction.type === 'Buy') {
-                coin.quantity += body.transaction.quantity;
-                const updatedHolding = await coin.save();
+        const holding = await Holding.findOne({ tracker: body.trackerId, coinId: body.coinId });
+        if (holding) {
+            if (body.type === 'Buy') {
+                await holding.updateOne({ $inc: { quantity: body.quantity } });
+                const updatedHolding = await holding.save();
                 const transaction: ITransaction = new Transaction({
-                    coinId: body.transaction.coinId,
-                    quantity: body.transaction.quantity,
-                    tracker: coin.tracker
+                    coinId: body.coinId,
+                    quantity: body.quantity,
+                    tracker: holding.tracker
                 });
                 const newTransaction: ITransaction = await transaction.save();
                 res.status(OK).json({
@@ -35,28 +35,28 @@ router.post('/new', async (req: Request, res: Response) => {
                     transaction: newTransaction
                 });
             }
-            if (body.transaction.type === 'Sell'){
-                if (body.transaction.quantity > coin.quantity) {
-                    throw "Cannot sell more than you own";
-                } else if (body.transaction.quantity === coin.quantity) {
+            if (body.type === 'Sell'){
+                if (Number(body.quantity) > Number(holding.quantity)) {
+                    throw new Error("Cannot sell more than you own");
+                } else if (Number(body.quantity) === Number(holding.quantity)) {
                     const transaction: ITransaction = new Transaction({
-                        coinId: body.transaction.coinId,
-                        quantity: body.transaction.quantity * -1,
-                        tracker: coin.tracker
+                        coinId: body.coinId,
+                        quantity: body.quantity * -1,
+                        tracker: holding.tracker
                     });
                     const newTransaction: ITransaction = await transaction.save();
-                    await coin.deleteOne();
+                    await Holding.findByIdAndDelete(holding._id);
                     res.status(OK).json({
                         message: 'Deleted holding, Transaction added',
                         transaction: newTransaction
                     });        
                 } else {
-                    coin.quantity -= body.transaction.quantity;
-                    const updatedHolding = await coin.save();
+                    await holding.updateOne({ $inc: { quantity: body.quantity * -1 } });
+                    const updatedHolding = await holding.save();
                     const transaction: ITransaction = new Transaction({
-                        coinId: body.transaction.coinId,
-                        quantity: body.transaction.quantity * -1,
-                        tracker: coin.tracker
+                        coinId: body.coinId,
+                        quantity: body.quantity * -1,
+                        tracker: holding.tracker
                     });
                     const newTransaction: ITransaction = await transaction.save();
                     res.status(OK).json({
@@ -67,27 +67,28 @@ router.post('/new', async (req: Request, res: Response) => {
                 }
             }
         } else {
-            if (body.transaction.type === 'Buy') {
+            if (body.type === 'Buy') {
                 const holding: IHolding = new Holding({
-                    coinId: body.transaction.coinId,
-                    quantity: body.transaction.quantity,
-                    tracker: body.transaction.tracker
+                    coinId: body.coinId,
+                    quantity: body.quantity,
+                    tracker: body.trackerId
                 });
                 const newHolding: IHolding = await holding.save();
                 const transaction: ITransaction = new Transaction({
-                    coinId: body.transaction.coinId,
-                    quantity: body.transaction.quantity,
-                    tracker: holding.tracker
+                    coinId: body.coinId,
+                    quantity: body.quantity,
+                    tracker: body.trackerId
                 });
                 const newTransaction: ITransaction = await transaction.save();
+                await Tracker.updateOne({ _id: body.trackerId }, { $push: { holdings: newHolding._id }});
                 res.status(CREATED).json({
-                    message: 'Holding added, Transaction added',
+                    message: 'Holding added, Transaction added, Tracker holdings updated',
                     holding: newHolding,
                     transaction: newTransaction
                 });
             }
-            if (body.transaction.type === 'Sell') {
-                throw "Cannot sell more than you own";
+            if (body.type === 'Sell') {
+                throw new Error("Cannot sell more than you own");
             }
         }
     } catch (err) {

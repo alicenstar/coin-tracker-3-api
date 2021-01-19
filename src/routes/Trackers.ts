@@ -35,14 +35,20 @@ router.post('/add', async (req: Request, res: Response) => {
  *                      Get One Tracker - "GET /api/trackers/:id"
  ******************************************************************************/
 
+// TODO: Figure out how to populate the holdings field
+
 router.get('/:id', async (req: Request, res: Response) => {
-    let tracker: ITracker | null;
+    // let tracker: ITracker | null;
     try {
-        tracker = await Tracker.findById(req.params.id);
-        if (tracker == null) {
-            return res.status(404).json({ message: 'Cannot find tracker' });
-        }
-        return res.status(OK).json({ tracker });
+        Tracker
+            .findById(req.params.id)
+            .populate([{path: 'holdings', model: 'Holding'}])
+            .exec(function (err, tracker) {
+                if (tracker == null) {
+                    return res.status(404).json({ message: 'Cannot find tracker' });
+                }
+                return res.status(OK).json({ tracker });
+            });    
     } catch (err) {
         res.status(500).json({
             message: err.message,

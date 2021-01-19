@@ -1,6 +1,6 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import { connect, connection } from 'mongoose';
+import { set, connect, connection } from 'mongoose';
 import morgan from 'morgan';
 import path from 'path';
 import helmet from 'helmet';
@@ -16,6 +16,7 @@ import { cookieProps } from '@shared/constants';
 const app = express();
 const { BAD_REQUEST } = StatusCodes;
 
+set('debug', true);
 connect(process.env.DATABASE_URL as string, {
     useNewUrlParser: true,
     useUnifiedTopology: true,

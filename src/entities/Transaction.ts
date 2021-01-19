@@ -1,10 +1,10 @@
 import { Document, model, Schema } from 'mongoose';
-import { IHolding } from './Holding';
+import { ITracker } from './Tracker';
 
 export interface ITransaction extends Document {
     price: number;
     quantity: number;
-    holding: IHolding;
+    tracker: ITracker;
 }
 
 const transactionSchema: Schema = new Schema(
@@ -20,12 +20,12 @@ const transactionSchema: Schema = new Schema(
         tracker: {
             type: Schema.Types.ObjectId,
             ref: 'Tracker',
-            required: [true, 'Holding is required'],
+            required: [true, 'Tracker is required'],
         },
     },
     {
         timestamps: true,
-        collection: 'holdings',
+        collection: 'transactions',
     }
 );
 

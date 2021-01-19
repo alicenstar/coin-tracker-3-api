@@ -8,6 +8,7 @@ export interface ITracker extends Document {
     holdings?: IHolding[];
 }
 
+
 const trackerSchema: Schema = new Schema(
     {
         name: {
@@ -18,10 +19,10 @@ const trackerSchema: Schema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'User',
         },
-        holdings: {
+        holdings: [{
             type: Schema.Types.ObjectId,
             ref: 'Holding',
-        },
+        }],
     },
     {
         timestamps: true,
