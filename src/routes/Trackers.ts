@@ -16,7 +16,7 @@ router.post('/add', async (req: Request, res: Response) => {
     try {
         const body = req.body;
         const tracker: ITracker = new Tracker({
-            name: body.newTrackerName
+            name: body.trackerName
         });
         if (body.owner) {
             tracker.owner = body.owner;
