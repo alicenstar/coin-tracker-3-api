@@ -37,17 +37,16 @@ router.get('/latest', async (req: Request, res: Response) => {
  *                      Get Latest Quotes - "GET /api/cmc/quotes"
  ******************************************************************************/
 
-router.get('/quotes', async (req: Request, res: Response) => {
+router.get('/quotes/:id', async (req: Request, res: Response) => {
     const requestOptions = {
         method: 'GET',
         headers: {
             'X-CMC_PRO_API_KEY': process.env.CMC_PRO_API_KEY as string
         }
     };
-    const { queryParams } = req.body;
     try {
         const response = await fetch(
-            `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?${queryParams}`,
+            `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${req.params.id}`,
             requestOptions
         );
         const json = await response.json();

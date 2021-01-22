@@ -4,6 +4,7 @@ import { ITracker } from './Tracker';
 export interface IHolding extends Document {
     coinId: number;
     quantity: number;
+    initialInvestment: number;
     tracker: ITracker;
 }
 
@@ -17,6 +18,10 @@ const holdingSchema: Schema = new Schema(
             type: Number,
             required: [true, 'Quantity is required'],
         },
+        initialInvestment: {
+            type: Number,
+            required: [true, 'Initial investment is required']
+        },
         tracker: {
             type: Schema.Types.ObjectId,
             ref: 'Tracker',
@@ -26,6 +31,9 @@ const holdingSchema: Schema = new Schema(
     {
         timestamps: true,
         collection: 'holdings',
+        // toJSON: {
+        //     virtuals: true
+        // },
     }
 );
 

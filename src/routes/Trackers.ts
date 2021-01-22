@@ -1,11 +1,9 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
-
 import Tracker, { ITracker } from '@entities/Tracker';
-
-const router = Router();
 const { BAD_REQUEST, CREATED, OK } = StatusCodes;
 
+const router = Router();
 
 
 /******************************************************************************
@@ -32,12 +30,32 @@ router.post('/add', async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
- *                      Get One Tracker - "GET /api/trackers/:id"
+ *                      Get A Tracker + Holdings - "GET /api/trackers/:id"
  ******************************************************************************/
 
-// TODO: Figure out how to populate the holdings field
-
 router.get('/:id', async (req: Request, res: Response) => {
+    try {
+        Tracker
+            .findById(req.params.id)
+            .populate([{path: 'holdings', model: 'Holding'}])
+            .exec(function (err, tracker) {
+                if (tracker == null) {
+                    return res.status(404).json({ message: 'Cannot find tracker' });
+                }
+                return res.status(OK).json({ tracker });
+            });    
+    } catch (err) {
+        res.status(500).json({
+            message: err.message,
+        });
+    }
+});
+
+/******************************************************************************
+ *                      Get A Tracker's Transactions - "GET /api/trackers/:id/transactions"
+ ******************************************************************************/
+
+router.get('/:id/transactions', async (req: Request, res: Response) => {
     // let tracker: ITracker | null;
     try {
         Tracker
