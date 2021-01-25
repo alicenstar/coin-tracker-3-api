@@ -4,7 +4,7 @@ import { ITracker } from './Tracker';
 export interface ITransaction extends Document {
     price: number;
     quantity: number;
-    priceAtPurchase: number;
+    priceAtTransaction: number;
     type: 'Buy' | 'Sell' | 'Adjustment'
     tracker: ITracker;
 }
@@ -19,9 +19,9 @@ const transactionSchema: Schema = new Schema(
             type: Number,
             required: [true, 'Quantity is required'],
         },
-        priceAtPurchase: {
+        priceAtTransaction: {
             type: Number,
-            required: [true, 'Price at purchase is required']
+            required: [true, 'Price at time of transaction is required']
         },
         type: {
             type: String,

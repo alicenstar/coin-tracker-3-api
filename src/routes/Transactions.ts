@@ -18,14 +18,14 @@ const { CREATED, OK } = StatusCodes;
 
 router.post('/', async (req: Request, res: Response) => {
     const body = req.body
-    if (body.type === 'Sell') {
-        body.quantity *= -1;
-    }
+    // if (body.type === 'Sell') {
+    //     body.quantity *= -1;
+    // }
     try {
         const transaction: ITransaction = new Transaction({
             coinId: body.coinId,
             quantity: body.quantity,
-            priceAtPurchase: body.priceAtPurchase,
+            priceAtTransaction: body.priceAtTransaction,
             type: body.type,
             tracker: body.trackerId
         });
@@ -77,7 +77,7 @@ router.put('/:id', async (req: Request, res: Response) => {
         await res.holding!.updateOne({
             $inc: {
                 quantity: body.quantity,
-                initialInvestment: body.quantity * body.priceAtPurchase
+                initialInvestment: body.quantity * body.priceAtTransaction
             }
         });
         const updatedHolding = await res.holding!.save();

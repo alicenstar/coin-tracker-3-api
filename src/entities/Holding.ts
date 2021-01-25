@@ -31,9 +31,6 @@ const holdingSchema: Schema = new Schema(
     {
         timestamps: true,
         collection: 'holdings',
-        // toJSON: {
-        //     virtuals: true
-        // },
     }
 );
 

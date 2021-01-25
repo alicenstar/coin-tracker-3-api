@@ -27,7 +27,18 @@ const trackerSchema: Schema = new Schema(
     {
         timestamps: true,
         collection: 'trackers',
+        toJSON: { virtuals: true }
     }
 );
+
+trackerSchema.virtual('initialInvestment').get(function(this: ITracker) {
+    if (this.holdings) {
+        return this.holdings
+            .map(holding => holding.initialInvestment)
+            .reduce((a, b) => a + b);
+    } else {
+        return 0;
+    }
+});
 
 export default model<ITracker>('Tracker', trackerSchema);
