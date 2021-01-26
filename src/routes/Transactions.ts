@@ -1,12 +1,11 @@
 import StatusCodes from 'http-status-codes';
 import {
-    NextFunction,
     Request,
-    RequestHandler,
     Response,
     Router } from 'express';
-import Holding, { IHolding } from '@entities/Holding';
 import Transaction, { ITransaction } from '@entities/Transaction';
+import mongoose from 'mongoose';
+
 
 const router = Router();
 const { CREATED, OK } = StatusCodes;
@@ -18,9 +17,6 @@ const { CREATED, OK } = StatusCodes;
 
 router.post('/', async (req: Request, res: Response) => {
     const body = req.body
-    // if (body.type === 'Sell') {
-    //     body.quantity *= -1;
-    // }
     try {
         const transaction: ITransaction = new Transaction({
             coinId: body.coinId,
@@ -38,7 +34,6 @@ router.post('/', async (req: Request, res: Response) => {
         res.status(400).json({ message: err.message });
     }
 });
-
 
 
 /******************************************************************************

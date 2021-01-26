@@ -15,11 +15,11 @@ const holdingSchema: Schema = new Schema(
             required: [true, 'Coin name is required'],
         },
         quantity: {
-            type: Number,
+            type: Schema.Types.Decimal128,
             required: [true, 'Quantity is required'],
         },
         initialInvestment: {
-            type: Number,
+            type: Schema.Types.Decimal128,
             required: [true, 'Initial investment is required']
         },
         tracker: {
@@ -33,5 +33,25 @@ const holdingSchema: Schema = new Schema(
         collection: 'holdings',
     }
 );
+
+const decimal2JSON = (v: any, i?: any, prev?: any) => {
+    if (v !== null && typeof v === 'object') {
+        if (v.constructor.name === 'Decimal128') {
+            prev[i] = v.toString();
+        } else {
+            Object.entries(v).forEach(([key, value]) => 
+                decimal2JSON(value, key, prev ? prev[i] : v)
+            );
+        }
+    }
+};
+  
+holdingSchema.set('toJSON', {
+    transform: (doc: any, ret: any) => {
+        decimal2JSON(ret);
+        return ret;
+    }
+});
+  
 
 export default model<IHolding>('Holding', holdingSchema);

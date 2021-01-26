@@ -6,8 +6,8 @@ import {
     Response,
     Router } from 'express';
 import Holding, { IHolding } from '@entities/Holding';
-import Transaction, { ITransaction } from '@entities/Transaction';
 import Tracker from '@entities/Tracker';
+import mongodb from 'mongodb';
 
 const router = Router();
 const { CREATED, OK } = StatusCodes;
@@ -70,14 +70,11 @@ router.post('/', async (req: Request, res: Response) => {
 
 router.put('/:id', findHolding, async (req: Request, res: Response) => {
     const body = req.body;
-    // if (body.type === 'Sell') {
-    //     body.quantity *= -1;
-    // }
     try {
         await res.holding!.updateOne({
             $inc: {
-                quantity: body.quantity,
-                initialInvestment: body.quantity * body.priceAtTransaction
+                quantity: mongodb.Decimal128.fromString(body.quantity.toString()),
+                initialInvestment: mongodb.Decimal128.fromString((body.quantity * body.priceAtTransaction).toString())
             }
         });
         const updatedHolding = await res.holding!.save();

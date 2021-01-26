@@ -5,7 +5,7 @@ import { IUser } from './User';
 export interface ITracker extends Document {
     name: string;
     owner?: IUser;
-    holdings?: IHolding[];
+    holdings: IHolding[];
 }
 
 
@@ -27,12 +27,31 @@ const trackerSchema: Schema = new Schema(
     {
         timestamps: true,
         collection: 'trackers',
-        toJSON: { virtuals: true }
+        toJSON: {
+            virtuals: true,
+            transform: (doc: any, ret: any) => {
+                decimal2JSON(ret);
+                return ret;
+            }
+        }
     }
 );
 
+const decimal2JSON = (v: any, i?: any, prev?: any) => {
+    if (v !== null && typeof v === 'object') {
+        if (v.constructor.name === 'Decimal128') {
+            prev[i] = v.toString();
+        } else {
+            Object.entries(v).forEach(([key, value]) => 
+                decimal2JSON(value, key, prev ? prev[i] : v)
+            );
+        }
+    }
+};
+
+
 trackerSchema.virtual('initialInvestment').get(function(this: ITracker) {
-    if (this.holdings) {
+    if (this.holdings.length > 0) {
         return this.holdings
             .map(holding => holding.initialInvestment)
             .reduce((a, b) => a + b);

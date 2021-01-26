@@ -12,15 +12,15 @@ export interface ITransaction extends Document {
 const transactionSchema: Schema = new Schema(
     {
         coinId: {
-            type: String,
-            required: [true, 'Coin name is required'],
+            type: Number,
+            required: [true, 'Coin ID is required'],
         },
         quantity: {
-            type: Number,
+            type: Schema.Types.Decimal128,
             required: [true, 'Quantity is required'],
         },
         priceAtTransaction: {
-            type: Number,
+            type: Schema.Types.Decimal128,
             required: [true, 'Price at time of transaction is required']
         },
         type: {
