@@ -12,11 +12,12 @@ import 'express-async-errors';
 import BaseRouter from './routes';
 import logger from '@shared/Logger';
 import { cookieProps } from '@shared/constants';
+import { updateListings } from './routes/Listings';
 
 const app = express();
 const { BAD_REQUEST } = StatusCodes;
 
-set('debug', true);
+// set('debug', true);
 connect(process.env.DATABASE_URL as string, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -58,6 +59,14 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     });
 });
 
+
+/************************************************************************************
+ *                              Serve front-end content
+ ***********************************************************************************/
+
+updateListings();
+// Update listings data every minute and a half
+const requestLoop = setInterval(updateListings, 90000);
 
 
 /************************************************************************************

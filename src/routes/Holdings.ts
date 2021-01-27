@@ -68,16 +68,16 @@ router.post('/', async (req: Request, res: Response) => {
  *                       Update A Holding - "PUT /api/holdings/:id"
  ******************************************************************************/
 
-router.put('/:id', findHolding, async (req: Request, res: Response) => {
+router.put('/:id', async (req: Request, res: Response) => {
     const body = req.body;
     try {
-        await res.holding!.updateOne({
+        const updatedHolding = await Holding.findOneAndUpdate({ _id: req.params.id }, {
             $inc: {
                 quantity: mongodb.Decimal128.fromString(body.quantity.toString()),
                 initialInvestment: mongodb.Decimal128.fromString((body.quantity * body.priceAtTransaction).toString())
             }
-        });
-        const updatedHolding = await res.holding!.save();
+        }, { new: true });
+        // const updatedHolding = await res.holding!.save();
         res.status(OK).json({
             message: 'Successfully updated holding',
             holding: updatedHolding
