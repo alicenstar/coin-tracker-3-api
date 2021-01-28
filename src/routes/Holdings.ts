@@ -41,11 +41,12 @@ const findHolding: RequestHandler = async (req: Request, res: Response, next: Ne
 
 router.post('/', async (req: Request, res: Response) => {
     const body = req.body;
+    const initialInvestment = parseFloat(body.priceAtTransaction) * parseFloat(body.quantity);
     try {
         const holding: IHolding = new Holding({
             coinId: body.coinId,
-            quantity: body.quantity,
-            initialInvestment: body.priceAtTransaction * body.quantity,
+            quantity: mongodb.Decimal128.fromString(body.quantity),
+            initialInvestment: mongodb.Decimal128.fromString(initialInvestment.toString()),
             tracker: body.trackerId
         });
         const newHolding: IHolding = await holding.save();
@@ -70,14 +71,15 @@ router.post('/', async (req: Request, res: Response) => {
 
 router.put('/:id', async (req: Request, res: Response) => {
     const body = req.body;
+    const initialInvestment = parseFloat(body.priceAtTransaction) * parseFloat(body.quantity);
+
     try {
         const updatedHolding = await Holding.findOneAndUpdate({ _id: req.params.id }, {
             $inc: {
                 quantity: mongodb.Decimal128.fromString(body.quantity.toString()),
-                initialInvestment: mongodb.Decimal128.fromString((body.quantity * body.priceAtTransaction).toString())
+                initialInvestment: mongodb.Decimal128.fromString(initialInvestment.toString())
             }
         }, { new: true });
-        // const updatedHolding = await res.holding!.save();
         res.status(OK).json({
             message: 'Successfully updated holding',
             holding: updatedHolding

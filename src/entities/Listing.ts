@@ -34,7 +34,7 @@ interface IListing extends Document {
 
 const quoteSchema: Schema = new Schema({
     price: {
-        type: Number,
+        type: Schema.Types.Decimal128,
         required: [true, 'Price is required'],
     },
     volume_24h: {
@@ -42,15 +42,15 @@ const quoteSchema: Schema = new Schema({
         required: [true, 'Volume 24 hours is required'],
     },
     percent_change_1h: {
-        type: Number,
+        type: Schema.Types.Decimal128,
         required: [true, 'Percent change 1 hour is required'],
     },
     percent_change_24h: {
-        type: Number,
+        type: Schema.Types.Decimal128,
         required: [true, 'Percent change 24 hours is required'],
     },
     percent_change_7d: {
-        type: Number,
+        type: Schema.Types.Decimal128,
         required: [true, 'Percent change 7 days is required'],
     },
     market_cap: {
@@ -130,7 +130,25 @@ const listingSchema: Schema = new Schema(
     {
         timestamps: true,
         collection: 'listings',
+        toJSON: {
+            transform: (doc: any, ret: any) => {
+                decimal2JSON(ret);
+                return ret;
+            }
+        }
     }
 );
+
+const decimal2JSON = (v: any, i?: any, prev?: any) => {
+    if (v !== null && typeof v === 'object') {
+        if (v.constructor.name === 'Decimal128') {
+            prev[i] = v.toString();
+        } else {
+            Object.entries(v).forEach(([key, value]) => 
+                decimal2JSON(value, key, prev ? prev[i] : v)
+            );
+        }
+    }
+};
 
 export default model<IListing>('Listing', listingSchema);

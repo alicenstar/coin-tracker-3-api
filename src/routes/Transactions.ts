@@ -4,7 +4,7 @@ import {
     Response,
     Router } from 'express';
 import Transaction, { ITransaction } from '@entities/Transaction';
-import mongoose from 'mongoose';
+import mongodb from 'mongodb';
 
 
 const router = Router();
@@ -20,8 +20,8 @@ router.post('/', async (req: Request, res: Response) => {
     try {
         const transaction: ITransaction = new Transaction({
             coinId: body.coinId,
-            quantity: body.quantity,
-            priceAtTransaction: body.priceAtTransaction,
+            quantity: mongodb.Decimal128.fromString(body.quantity),
+            priceAtTransaction: mongodb.Decimal128.fromString(body.priceAtTransaction),
             type: body.type,
             tracker: body.trackerId
         });
@@ -71,8 +71,8 @@ router.put('/:id', async (req: Request, res: Response) => {
     try {
         await res.holding!.updateOne({
             $inc: {
-                quantity: body.quantity,
-                initialInvestment: body.quantity * body.priceAtTransaction
+                quantity: mongodb.Decimal128.fromString(body.quantity),
+                initialInvestment: mongodb.Decimal128.fromString((body.quantity * body.priceAtTransaction).toString())
             }
         });
         const updatedHolding = await res.holding!.save();

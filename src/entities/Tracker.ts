@@ -52,8 +52,12 @@ const decimal2JSON = (v: any, i?: any, prev?: any) => {
 
 trackerSchema.virtual('initialInvestment').get(function(this: ITracker) {
     if (this.holdings.length > 0) {
+        // const json = this.holdings.toJSON();
         return this.holdings
-            .map(holding => holding.initialInvestment)
+            .map(holding => {
+                const json = holding.toJSON()
+                return Number(json.initialInvestment);
+            })
             .reduce((a, b) => a + b);
     } else {
         return 0;

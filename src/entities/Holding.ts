@@ -31,6 +31,12 @@ const holdingSchema: Schema = new Schema(
     {
         timestamps: true,
         collection: 'holdings',
+        toJSON: {
+            transform: (doc: any, ret: any) => {
+                decimal2JSON(ret);
+                return ret;
+            }
+        }
     }
 );
 
@@ -45,13 +51,6 @@ const decimal2JSON = (v: any, i?: any, prev?: any) => {
         }
     }
 };
-  
-holdingSchema.set('toJSON', {
-    transform: (doc: any, ret: any) => {
-        decimal2JSON(ret);
-        return ret;
-    }
-});
   
 
 export default model<IHolding>('Holding', holdingSchema);
