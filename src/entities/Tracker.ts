@@ -4,7 +4,7 @@ import { IUser } from './User';
 
 export interface ITracker extends Document {
     name: string;
-    owner?: IUser;
+    user?: IUser;
     holdings: IHolding[];
 }
 
@@ -15,7 +15,7 @@ const trackerSchema: Schema = new Schema(
             type: String,
             required: [true, 'Tracker name is required'],
         },
-        owner: {
+        user: {
             type: Schema.Types.ObjectId,
             ref: 'User',
         },

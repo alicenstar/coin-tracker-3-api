@@ -1,16 +1,13 @@
 import { Document, model, Schema } from 'mongoose';
 import { ITracker } from './Tracker';
 
-// export enum UserRoles {
-//     Standard,
-//     Admin,
-// }
 
 export interface IUser extends Document {
     username: string;
     pwdHash: string;
     email: string;
-    trackers?: ITracker | ITracker[];
+    trackers: ITracker | ITracker[];
+    role: 'User' | 'Admin';
 }
 
 const userSchema: Schema = new Schema(
@@ -19,7 +16,7 @@ const userSchema: Schema = new Schema(
             type: String,
             required: [true, 'Username is required'],
             trim: true,
-            minlength: 6,
+            minlength: 4,
         },
         pwdHash: {
             type: String,
@@ -35,6 +32,10 @@ const userSchema: Schema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Tracker',
         },
+        role: {
+            type: String,
+            required: [true, 'Role is required']
+        }
     },
     {
         timestamps: true,

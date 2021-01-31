@@ -1,8 +1,3 @@
-import { Request } from 'express';
-import { IUser } from '@entities/User';
-
-
-
 // Strings
 export const paramMissingError = 'One or more of the required parameters was missing.';
 export const loginFailedErr = 'Login failed';
@@ -21,14 +16,7 @@ export const cookieProps = Object.freeze({
         maxAge: Number(process.env.COOKIE_EXP),
         domain: (process.env.COOKIE_DOMAIN),
         secure: (process.env.SECURE_COOKIE === 'true'),
+        SameSite: "Strict"
     },
 });
 
-// IRequest object for express routes
-export interface IRequest extends Request {
-    body: {
-        user: IUser;
-        email: string;
-        pwdHash: string;
-    }
-} 

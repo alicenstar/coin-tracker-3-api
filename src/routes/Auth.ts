@@ -1,27 +1,28 @@
 import bcrypt from 'bcrypt';
 import { Request, Response, Router } from 'express';
 import StatusCodes from 'http-status-codes';
-
-// import UserDao from '@daos/User/UserDao.mock';
 import { JwtService } from '@shared/JwtService';
-import { paramMissingError, loginFailedErr, cookieProps, IRequest } from '@shared/constants';
+import {
+    paramMissingError,
+    loginFailedErr,
+    cookieProps,
+    pwdSaltRounds
+} from '@shared/constants';
 import User, { IUser } from '@entities/User';
 
 const router = Router();
-// const userDao = new UserDao();
 const jwtService = new JwtService();
 const { BAD_REQUEST, OK, UNAUTHORIZED, NOT_FOUND } = StatusCodes;
-
 
 
 /******************************************************************************
  *                      Login User - "POST /api/auth/login"
  ******************************************************************************/
 
-router.post('/login', async (req: IRequest, res: Response) => {
+router.post('/login', async (req: Request, res: Response) => {
     // Check email and password present
-    const { email, pwdHash } = req.body;
-    if (!(email && pwdHash)) {
+    const { username, password } = req.body;
+    if (!(username && password)) {
         return res.status(BAD_REQUEST).json({
             error: paramMissingError,
         });
@@ -30,7 +31,7 @@ router.post('/login', async (req: IRequest, res: Response) => {
     // Fetch user
     let user: IUser | null;
     try {
-        user = await User.findOne({ 'email': email });
+        user = await User.findOne({ username: username });
         if (user == null) {
             return res.status(UNAUTHORIZED).json({ error: loginFailedErr });
         }
@@ -39,7 +40,7 @@ router.post('/login', async (req: IRequest, res: Response) => {
     }
     
     // Check password
-    const pwdPassed = await bcrypt.compare(pwdHash, user.pwdHash);
+    const pwdPassed = await bcrypt.compare(password, user.pwdHash);
     if (!pwdPassed) {
         return res.status(UNAUTHORIZED).json({
             error: loginFailedErr,
@@ -47,13 +48,19 @@ router.post('/login', async (req: IRequest, res: Response) => {
     }
     // Setup Admin Cookie
     const jwt = await jwtService.getJwt({
-        id: user.id,
+        id: user._id,
         username: user.username,
+        role: user.role
     });
     const { key, options } = cookieProps;
     res.cookie(key, jwt, options);
     // Return
-    return res.status(OK).end();
+    return res.status(OK).json({
+        user: {
+            id: user._id,
+            username: user.username,
+        },
+    });
 });
 
 

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
-
 import randomString from 'randomstring';
 import jsonwebtoken, { VerifyErrors } from 'jsonwebtoken';
 import { cookieProps } from '@shared/constants';
@@ -8,6 +6,7 @@ import { cookieProps } from '@shared/constants';
 interface IClientData {
     id: number;
     username: string;
+    role: 'User' | 'Admin';
 }
 
 interface IOptions {

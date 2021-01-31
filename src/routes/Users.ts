@@ -1,14 +1,12 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
-
-// import UserDao from '@daos/User/UserDao.mock';
-import { paramMissingError, IRequest } from '@shared/constants';
+import bcrypt from 'bcrypt';
+import { pwdSaltRounds } from '@shared/constants';
 import User, { IUser } from '@entities/User';
-// import { userInfo } from 'os';
+import { adminMW } from './middleware';
 
 const router = Router();
-// const userDao = new UserDao();
-const { BAD_REQUEST, CREATED, OK } = StatusCodes;
+const { CREATED, OK } = StatusCodes;
 
 
 
@@ -16,10 +14,7 @@ const { BAD_REQUEST, CREATED, OK } = StatusCodes;
  *                      Get All Users - "GET /api/users/all"
  ******************************************************************************/
 
-router.get('/all', async (req: Request, res: Response) => {
-    // const users = await userDao.getAll();
-    // return res.status(OK).json({users});
-
+router.get('/all', adminMW, async (req: Request, res: Response) => {
     try {
         const users: IUser[] = await User.find();
         res.status(OK).json({ users });
@@ -48,61 +43,49 @@ router.get('/:id', async (req: Request, res: Response) => {
 })
 
 /******************************************************************************
- *                       Add A User - "POST /api/users/add"
+ *                       Add A User - "POST /api/users/"
  ******************************************************************************/
 
-router.post('/add', async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
     const body = req.body;
     let user: IUser | null;
     try {
-        user = await User.findOne({ email: body.email });
+        user = await User.findOne({ username: body.username });
         if (user != null) {
-            return res.status(404).json({ message: 'Email already exists' });
+            return res.status(404).json({ message: 'Username already exists' });
         }
+        const pwdHash = await bcrypt.hash(body.password, pwdSaltRounds);
         user = new User({
             username: body.username,
-            pwdHash: body.pwdHash,
+            pwdHash: pwdHash,
             email: body.email,
+            role: 'User'
         });
         const newUser: IUser = await user.save();
         res.status(CREATED).json({
             message: 'User added',
-            user: newUser
+            user: {
+                id: newUser._id,
+                username: newUser.username,
+            },
         });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
-    // const { user } = req.body;
-    // if (!user) {
-    //     return res.status(BAD_REQUEST).json({
-    //         error: paramMissingError,
-    //     });
-    // }
-    // await userDao.add(user);
-    // return res.status(CREATED).end();
 });
 
 
 
 /******************************************************************************
- *                       Update A User - "PUT /api/users/update"
+ *                       Update A User - "PUT /api/users/:id"
  ******************************************************************************/
 
-router.patch('/update', async (req: Request, res: Response) => {
-    // const { user } = req.body;
-    // if (!user) {
-    //     return res.status(BAD_REQUEST).json({
-    //         error: paramMissingError,
-    //     });
-    // }
-    // user.id = Number(user.id);
-    // await userDao.update(user);
-    // return res.status(OK).end();
-
+router.put('/:id', async (req: Request, res: Response) => {
+    const body = req.body;
     try {
         const updatedUser = await User.findByIdAndUpdate(
-            req.body.user.id,
-            req.body.user
+            body.user.id,
+            body.user
         );
         res.status(OK).json(updatedUser);
     } catch (err) {
@@ -113,14 +96,10 @@ router.patch('/update', async (req: Request, res: Response) => {
 
 
 /******************************************************************************
- *                    Delete A User - "DELETE /api/users/delete/:id"
+ *                    Delete A User - "DELETE /api/users/:id"
  ******************************************************************************/
 
-router.delete('/delete/:id', async (req: Request, res: Response) => {
-    // const { id } = req.params;
-    // await userDao.delete(Number(id));
-    // return res.status(OK).end();
-
+router.delete('/:id', async (req: Request, res: Response) => {
     try {
         await User.findByIdAndDelete(req.params.id);
         res.status(OK).json({ message: 'Deleted user' });

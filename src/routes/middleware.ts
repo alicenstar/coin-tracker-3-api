@@ -1,7 +1,5 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response, NextFunction } from 'express';
-
-// import { UserRoles } from '@entities/User';
 import { cookieProps } from '@shared/constants';
 import { JwtService } from '@shared/JwtService';
 
@@ -19,9 +17,9 @@ export const adminMW = async (req: Request, res: Response, next: NextFunction) =
         if (!jwt) {
             throw Error('JWT not present in signed cookie.');
         }
-        // Make sure user role is an admin
+        // // Make sure user role is an admin
         const clientData = await jwtService.decodeJwt(jwt);
-        if (clientData.username === 'ayelai') {
+        if (clientData.role === 'Admin') {
             res.locals.userId = clientData.id;
             next();
         } else {
