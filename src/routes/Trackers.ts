@@ -1,6 +1,8 @@
 import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
 import Tracker, { ITracker } from '@entities/Tracker';
+import stringify from 'csv-stringify';
+
 const { BAD_REQUEST, CREATED, OK } = StatusCodes;
 
 const router = Router();
@@ -30,7 +32,7 @@ router.post('/', async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
- *                      Get A Tracker + Holdings - "GET /api/trackers/:id"
+ *                Get A Tracker + Holdings - "GET /api/trackers/:id"
  ******************************************************************************/
 
 router.get('/:id', async (req: Request, res: Response) => {
@@ -52,11 +54,49 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
- *                      Get A Tracker's Transactions - "GET /api/trackers/:id/transactions"
+ *              Download A Tracker - "GET /api/trackers/download/:id"
+ ******************************************************************************/
+
+router.get('/download/:id', async (req: Request, res: Response) => {
+    try {
+        const trackerData = await Tracker
+                                    .findById(req.params.id)
+                                    .populate([{path: 'holdings', model: 'Holding'}])
+                                    .exec();
+        if (trackerData) {
+            const trackerJson = trackerData.toJSON();
+            const edittedHoldings = trackerJson.holdings.map((holding: any) => {
+                delete holding._id;
+                delete holding.createdAt;
+                delete holding.updatedAt;
+                delete holding.__v;
+                holding.tracker = holding.tracker.toString()
+                return holding;
+            });
+            console.log(edittedHoldings)
+
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition',
+                'attachment; filename=\"' + 'tracker-' + trackerData._id + '.csv\"'
+            );
+            res.setHeader('Cache-Control', 'no-cache');
+            res.setHeader('Pragma', 'no-cache');
+
+            stringify(edittedHoldings, { header: true })
+                .pipe(res);
+        } else {
+            return res.status(500).json({ message: 'No tracker found' });
+        }
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+/******************************************************************************
+ *      Get A Tracker's Transactions - "GET /api/trackers/:id/transactions"
  ******************************************************************************/
 
 router.get('/:id/transactions', async (req: Request, res: Response) => {
-    // let tracker: ITracker | null;
     try {
         Tracker
             .findById(req.params.id)
