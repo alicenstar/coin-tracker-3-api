@@ -31,14 +31,18 @@ router.post('/login', async (req: Request, res: Response) => {
     // Fetch user
     let user: IUser | null;
     try {
-        user = await User.findOne({ username: username });
+        user = await User
+                        .findOne({ username: username })
+                        .populate([{path: 'trackers', model: 'Tracker'}])
+                        .exec();
         if (user == null) {
             return res.status(UNAUTHORIZED).json({ error: loginFailedErr });
         }
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
-    
+    // user = await user.execPopulate([{path: 'trackers', model: 'Tracker'}]);
+    console.log('user', user);
     // Check password
     const pwdPassed = await bcrypt.compare(password, user.pwdHash);
     if (!pwdPassed) {
@@ -60,6 +64,7 @@ router.post('/login', async (req: Request, res: Response) => {
             id: user._id,
             username: user.username,
         },
+        trackers: user.trackers
     });
 });
 

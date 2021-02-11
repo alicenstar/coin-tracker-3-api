@@ -26,17 +26,26 @@ router.get('/all', adminMW, async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
- *                      Get One User - "GET /api/users/:id"
+ *                      Get A User - "GET /api/users/:id"
  ******************************************************************************/
 
 router.get('/:id', async (req: Request, res: Response) => {
-    let user: IUser | null;
+    // let user: IUser | null;
     try {
-        user = await User.findById(req.params.id);
-        if (user == null) {
-            return res.status(404).json({ message: 'Cannot find user' });
-        }
-        return res.status(OK).json({ user });
+        User
+            .findById(req.params.id)
+            .populate([{path: 'trackers', model: 'Tracker'}])
+            .exec(function (err, user) {
+                if (user == null) {
+                    return res.status(404).json({ message: 'Cannot find user' });
+                }
+                return res.status(OK).json({ user });
+            });    
+        // user = await User.findById(req.params.id);
+        // if (user == null) {
+        //     return res.status(404).json({ message: 'Cannot find user' });
+        // }
+        // return res.status(OK).json({ user });
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
