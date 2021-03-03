@@ -34,7 +34,7 @@ const proxy = url.parse(process.env.PROXIMO_URL)
 const options =
     hostname: proxy.hostname
     port:     proxy.port || 80
-    path:     "http://api.someservice.com/endpoint"
+    path:     "https://coin-tracker-api.herokuapp.com/"
     headers:
       "Proxy-Authorization": "Basic #{new Buffer(proxy.auth).toString("base64")}"
 
