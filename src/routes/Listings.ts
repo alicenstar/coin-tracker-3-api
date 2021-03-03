@@ -17,7 +17,7 @@ export const updateListings = async () => {
     };
     try {
         const response = await fetch(
-            'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?sort=market_cap',
+            'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=500',
             requestOptions
         );
         const json = await response.json();
@@ -30,7 +30,7 @@ export const updateListings = async () => {
                 { upsert: true }
             );
         }
-        return console.log(`${res.nModified} listing documents modified out of ${res.n} matches`);
+        return console.log(`Listings updated`);
     } catch (err) {
         return console.log('error updating listings database')
     }
@@ -43,7 +43,7 @@ export const updateListings = async () => {
 
 router.get('/', async (req: Request, res: Response) => {
     try {
-        const listings = await Listing.find();
+        const listings = await Listing.find().sort({ cmc_rank: 'asc' });
         return res.status(OK).json({ listings });
     } catch (err) {
         res.status(500).json({
