@@ -29,19 +29,6 @@ const db = connection;
 db.on('error', (error) => console.error(error));
 db.once('open', () => console.log('Connected to database'));
 
-const proxy = url.parse(process.env.PROXIMO_URL)
-
-const options =
-    hostname: proxy.hostname
-    port:     proxy.port || 80
-    path:     "https://coin-tracker-api.herokuapp.com/"
-    headers:
-      "Proxy-Authorization": "Basic #{new Buffer(proxy.auth).toString("base64")}"
-
-  http.get options, (res) ->
-    console.log "status code", res.statusCode
-    console.log "headers", res.headers
-
 
 /************************************************************************************
  *                              Set basic express settings
