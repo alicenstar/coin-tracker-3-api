@@ -34,7 +34,9 @@ db.once('open', () => console.log('Connected to database'));
  *                              Set basic express settings
  ***********************************************************************************/
 
-app.use(cors());
+app.use(cors({
+    origin: 'https://coin-tracker-client.herokuapp.com/'
+}));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser(cookieProps.secret));
