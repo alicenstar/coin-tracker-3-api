@@ -13,6 +13,8 @@ import BaseRouter from './routes';
 import logger from '@shared/Logger';
 import { cookieProps } from '@shared/constants';
 import { updateListings } from './routes/Listings';
+import http from "http";
+import url from "url";
 
 const app = express();
 const { BAD_REQUEST } = StatusCodes;
@@ -26,6 +28,19 @@ connect(process.env.DATABASE_URL as string, {
 const db = connection;
 db.on('error', (error) => console.error(error));
 db.once('open', () => console.log('Connected to database'));
+
+const proxy = url.parse(process.env.PROXIMO_URL)
+
+const options =
+    hostname: proxy.hostname
+    port:     proxy.port || 80
+    path:     "http://api.someservice.com/endpoint"
+    headers:
+      "Proxy-Authorization": "Basic #{new Buffer(proxy.auth).toString("base64")}"
+
+  http.get options, (res) ->
+    console.log "status code", res.statusCode
+    console.log "headers", res.headers
 
 
 /************************************************************************************
