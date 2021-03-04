@@ -80,7 +80,7 @@
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.1",
     "randomstring": "^1.1.5",
-    "ts-node": "^9.1.1",
+    "ts-node": "^9.1.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
