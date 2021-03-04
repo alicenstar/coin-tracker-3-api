@@ -1,1 +1,1 @@
-web: ts-node build.ts && start
+web: ts-node build.ts && npm start
