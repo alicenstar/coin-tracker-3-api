@@ -15,12 +15,12 @@ const options = commandLineArgs([
 ]);
 
 // Set the env file
-const result2 = dotenv.config({
-    path: `./src/pre-start/env/test.env`,
-});
-if (result2.error) {
-    throw result2.error;
-}
+// const result2 = dotenv.config({
+//     path: `./src/pre-start/env/test.env`,
+// });
+// if (result2.error) {
+//     throw result2.error;
+// }
 
 
 // Init Jasmine
