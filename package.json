@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "prestart": "ts-node build.ts",
-    "build": "ts-node build.ts",
+/**
+*    "build": "ts-node build.ts",
+*/
     "lint": "eslint . --ext .ts",
     "start": "node -r module-alias/register ./dist --env=production --inspect",
     "start:dev": "nodemon",
