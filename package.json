@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "start": "node -r module-alias/register ./dist --env=production --inspect",
+    "start": "node -r module-alias/register ./dist --env=production",
     "postinstall": "ts-node build.ts",
     "start:dev": "nodemon",
     "test": "nodemon --config ./spec/nodemon.json"
