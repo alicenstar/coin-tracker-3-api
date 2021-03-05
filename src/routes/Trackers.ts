@@ -101,7 +101,7 @@ router.get('/download/:id', async (req: Request, res: Response) => {
 router.post('/upload/:id', async (req: Request, res: Response) => {
     try {
         // Remove existing holdings
-        await Holding.deleteMany({ tracker: req.params.id });
+        await Tracker.deleteMany({ _id: req.body[0][3] });
         // create a new Holding document for each holding
         await Promise.all(req.body.map(async (holding: any) => {
             const document: IHolding = new Holding({

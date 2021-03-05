@@ -28,14 +28,14 @@ exports.updateListings = () => __awaiter(void 0, void 0, void 0, function* () {
         }
     };
     try {
-        const response = yield node_fetch_1.default('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?sort=market_cap', requestOptions);
+        const response = yield node_fetch_1.default('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=500', requestOptions);
         const json = yield response.json();
         let res;
         for (const listing of json.data) {
             // create or update (replace) coin listing
             res = yield Listing_1.default.replaceOne({ id: listing.id }, listing, { upsert: true });
         }
-        return console.log(`${res.nModified} listing documents modified out of ${res.n} matches`);
+        return console.log(`Listings updated`);
     }
     catch (err) {
         return console.log('error updating listings database');
@@ -46,7 +46,7 @@ exports.updateListings = () => __awaiter(void 0, void 0, void 0, function* () {
  ******************************************************************************/
 router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const listings = yield Listing_1.default.find();
+        const listings = yield Listing_1.default.find().sort({ cmc_rank: 'asc' });
         return res.status(OK).json({ listings });
     }
     catch (err) {

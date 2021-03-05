@@ -55,7 +55,7 @@ app.use((err, req, res, next) => {
  ***********************************************************************************/
 Listings_1.updateListings();
 // Update listings data every minute and a half
-const requestLoop = setInterval(Listings_1.updateListings, 90000);
+const requestLoop = setInterval(Listings_1.updateListings, 300000);
 /************************************************************************************
  *                              Serve front-end content
  ***********************************************************************************/

@@ -69,16 +69,25 @@ router.put('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const body = req.body;
     const initialInvestment = parseFloat(body.priceAtTransaction) * parseFloat(body.quantity);
     try {
-        const updatedHolding = yield Holding_1.default.findOneAndUpdate({ _id: req.params.id }, {
-            $inc: {
-                quantity: mongodb_1.default.Decimal128.fromString(body.quantity.toString()),
-                initialInvestment: mongodb_1.default.Decimal128.fromString(initialInvestment.toString())
-            }
-        }, { new: true });
-        res.status(OK).json({
-            message: 'Successfully updated holding',
-            holding: updatedHolding
-        });
+        if (body.quantity === 0) {
+            const result = yield Holding_1.default.deleteOne({ coinId: body.coinId });
+            res.status(OK).json({
+                message: 'Successfully updated and deleted holding',
+                result: result
+            });
+        }
+        else {
+            const updatedHolding = yield Holding_1.default.findOneAndUpdate({ _id: req.params.id }, {
+                $inc: {
+                    quantity: mongodb_1.default.Decimal128.fromString(body.quantity.toString()),
+                    initialInvestment: mongodb_1.default.Decimal128.fromString(initialInvestment.toString())
+                }
+            }, { new: true });
+            res.status(OK).json({
+                message: 'Successfully updated holding',
+                holding: updatedHolding
+            });
+        }
     }
     catch (err) {
         res.status(400).json({ message: err.message });

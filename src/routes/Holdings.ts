@@ -75,7 +75,7 @@ router.put('/:id', async (req: Request, res: Response) => {
 
     try {
         if (body.quantity === 0) {
-            const result = await Holding.deleteOne({ coinId: req.params.id });
+            const result = await Holding.deleteOne({ coinId: body.coinId });
             res.status(OK).json({
                 message: 'Successfully updated and deleted holding',
                 result: result

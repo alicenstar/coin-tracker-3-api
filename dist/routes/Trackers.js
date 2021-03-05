@@ -16,6 +16,8 @@ const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const express_1 = require("express");
 const Tracker_1 = __importDefault(require("@entities/Tracker"));
 const csv_stringify_1 = __importDefault(require("csv-stringify"));
+const Holding_1 = __importDefault(require("@entities/Holding"));
+const mongodb_1 = __importDefault(require("mongodb"));
 const { BAD_REQUEST, CREATED, OK } = http_status_codes_1.default;
 const router = express_1.Router();
 /******************************************************************************
@@ -80,7 +82,6 @@ router.get('/download/:id', (req, res) => __awaiter(void 0, void 0, void 0, func
                 holding.tracker = holding.tracker.toString();
                 return holding;
             });
-            console.log(edittedHoldings);
             res.setHeader('Content-Type', 'text/csv');
             res.setHeader('Content-Disposition', 'attachment; filename=\"' + 'tracker-' + trackerData._id + '.csv\"');
             res.setHeader('Cache-Control', 'no-cache');
@@ -91,6 +92,36 @@ router.get('/download/:id', (req, res) => __awaiter(void 0, void 0, void 0, func
         else {
             return res.status(500).json({ message: 'No tracker found' });
         }
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}));
+/******************************************************************************
+ *              Upload A Tracker - "GET /api/trackers/upload/:id"
+ ******************************************************************************/
+router.post('/upload/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Remove existing holdings
+        yield Tracker_1.default.deleteMany({ _id: req.body[0][3] });
+        // create a new Holding document for each holding
+        yield Promise.all(req.body.map((holding) => __awaiter(void 0, void 0, void 0, function* () {
+            const document = new Holding_1.default({
+                coinId: holding[0],
+                quantity: mongodb_1.default.Decimal128.fromString(holding[1]),
+                initialInvestment: mongodb_1.default.Decimal128.fromString(holding[2].toString()),
+                tracker: holding[3]
+            });
+            const newHolding = yield document.save();
+            yield Tracker_1.default.updateOne({ _id: req.params.id }, {
+                $push: {
+                    holdings: newHolding._id
+                }
+            });
+        })));
+        res.status(CREATED).json({
+            message: 'Holdings added, Tracker holdings updated',
+        });
     }
     catch (err) {
         res.status(500).json({ message: err.message });
