@@ -67,7 +67,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 updateListings();
 // Update listings data every minute and a half
-const requestLoop = setInterval(updateListings, 120000);
+const requestLoop = setInterval(updateListings, 300000);
 
 
 /************************************************************************************
