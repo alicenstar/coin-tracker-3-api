@@ -2,8 +2,9 @@ import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
 import Tracker, { ITracker } from '@entities/Tracker';
 import stringify from 'csv-stringify';
-import parse from 'csv-parse';
-import fs from 'fs';
+import Holding, { IHolding } from '@entities/Holding';
+import mongodb from 'mongodb';
+
 
 const { BAD_REQUEST, CREATED, OK } = StatusCodes;
 
@@ -99,40 +100,26 @@ router.get('/download/:id', async (req: Request, res: Response) => {
 
 router.post('/upload/:id', async (req: Request, res: Response) => {
     try {
-        console.log('csv', req.body);
-        // const parser = fs.createReadStream(req.body).pipe(parse());
-        // let parsedData = [];
-        // for await (const record of parser) {
-        //     parsedData.push(record);
-        // }
-        // console.log('parsed', parsedData);
-        // const trackerData = await Tracker
-        //                             .findById(req.params.id)
-        //                             .populate([{path: 'holdings', model: 'Holding'}])
-        //                             .exec();
-        // if (trackerData) {
-        //     const trackerJson = trackerData.toJSON();
-        //     const edittedHoldings = trackerJson.holdings.map((holding: any) => {
-        //         delete holding._id;
-        //         delete holding.createdAt;
-        //         delete holding.updatedAt;
-        //         delete holding.__v;
-        //         holding.tracker = holding.tracker.toString()
-        //         return holding;
-        //     });
-
-        //     res.setHeader('Content-Type', 'text/csv');
-        //     res.setHeader('Content-Disposition',
-        //         'attachment; filename=\"' + 'tracker-' + trackerData._id + '.csv\"'
-        //     );
-        //     res.setHeader('Cache-Control', 'no-cache');
-        //     res.setHeader('Pragma', 'no-cache');
-
-        //     stringify(edittedHoldings, { header: true })
-        //         .pipe(res);
-        // } else {
-        //     return res.status(500).json({ message: 'No tracker found' });
-        // }
+        // Remove existing holdings
+        await Holding.deleteMany({ tracker: req.params.id });
+        // create a new Holding document for each holding
+        await Promise.all(req.body.map(async (holding: any) => {
+            const document: IHolding = new Holding({
+                coinId: holding[0],
+                quantity: mongodb.Decimal128.fromString(holding[1]),
+                initialInvestment: mongodb.Decimal128.fromString(holding[2].toString()),
+                tracker: holding[3]
+            });
+            const newHolding: IHolding = await document.save();
+            await Tracker.updateOne({ _id: req.params.id }, {
+                $push: {
+                    holdings: newHolding._id
+                }
+            });
+        }));
+        res.status(CREATED).json({
+            message: 'Holdings added, Tracker holdings updated',
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
