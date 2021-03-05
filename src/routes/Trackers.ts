@@ -2,6 +2,8 @@ import StatusCodes from 'http-status-codes';
 import { Request, Response, Router } from 'express';
 import Tracker, { ITracker } from '@entities/Tracker';
 import stringify from 'csv-stringify';
+import parse from 'csv-parse';
+import fs from 'fs';
 
 const { BAD_REQUEST, CREATED, OK } = StatusCodes;
 
@@ -73,7 +75,6 @@ router.get('/download/:id', async (req: Request, res: Response) => {
                 holding.tracker = holding.tracker.toString()
                 return holding;
             });
-            console.log(edittedHoldings)
 
             res.setHeader('Content-Type', 'text/csv');
             res.setHeader('Content-Disposition',
@@ -87,6 +88,51 @@ router.get('/download/:id', async (req: Request, res: Response) => {
         } else {
             return res.status(500).json({ message: 'No tracker found' });
         }
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+/******************************************************************************
+ *              Upload A Tracker - "GET /api/trackers/upload/:id"
+ ******************************************************************************/
+
+router.post('/upload/:id', async (req: Request, res: Response) => {
+    try {
+        console.log('csv', req.body);
+        // const parser = fs.createReadStream(req.body).pipe(parse());
+        // let parsedData = [];
+        // for await (const record of parser) {
+        //     parsedData.push(record);
+        // }
+        // console.log('parsed', parsedData);
+        // const trackerData = await Tracker
+        //                             .findById(req.params.id)
+        //                             .populate([{path: 'holdings', model: 'Holding'}])
+        //                             .exec();
+        // if (trackerData) {
+        //     const trackerJson = trackerData.toJSON();
+        //     const edittedHoldings = trackerJson.holdings.map((holding: any) => {
+        //         delete holding._id;
+        //         delete holding.createdAt;
+        //         delete holding.updatedAt;
+        //         delete holding.__v;
+        //         holding.tracker = holding.tracker.toString()
+        //         return holding;
+        //     });
+
+        //     res.setHeader('Content-Type', 'text/csv');
+        //     res.setHeader('Content-Disposition',
+        //         'attachment; filename=\"' + 'tracker-' + trackerData._id + '.csv\"'
+        //     );
+        //     res.setHeader('Cache-Control', 'no-cache');
+        //     res.setHeader('Pragma', 'no-cache');
+
+        //     stringify(edittedHoldings, { header: true })
+        //         .pipe(res);
+        // } else {
+        //     return res.status(500).json({ message: 'No tracker found' });
+        // }
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
