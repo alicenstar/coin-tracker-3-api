@@ -101,14 +101,16 @@ router.get('/download/:id', async (req: Request, res: Response) => {
 router.post('/upload/:id', async (req: Request, res: Response) => {
     try {
         // Remove existing holdings
-        await Tracker.deleteMany({ _id: req.body[0][3] });
+        await Holding.find({ 'tracker._id': req.params.id }).deleteMany();
+        // const tracker = await Tracker.findById(req.params.id)
+        // tracker?.holdings.remove();
         // create a new Holding document for each holding
         await Promise.all(req.body.map(async (holding: any) => {
             const document: IHolding = new Holding({
                 coinId: holding[0],
                 quantity: mongodb.Decimal128.fromString(holding[1]),
                 initialInvestment: mongodb.Decimal128.fromString(holding[2].toString()),
-                tracker: holding[3]
+                tracker: req.params.id
             });
             const newHolding: IHolding = await document.save();
             await Tracker.updateOne({ _id: req.params.id }, {
