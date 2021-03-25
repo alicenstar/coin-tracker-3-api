@@ -12,4 +12,4 @@ Are you tired of having to log in to seven different exchanges just to see where
 - Utilized `TypeScript` to add type safety
 - Integrated `csv-parser` to read and write `.csv` files
 - Designed `RESTful API` endpoints to manage front end interactions with the database
-- Created endpoints to interact with the `CoinMarketCap API`
+- Created endpoints to retrieve and store data from the `CoinMarketCap API`
