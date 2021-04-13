@@ -17,7 +17,7 @@ export const updateListings = async () => {
     };
     try {
         const response = await fetch(
-            'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=500',
+            'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=400',
             requestOptions
         );
         const json = await response.json();
