@@ -1,5 +1,5 @@
 # Coin Tracker
-###### *This is the API repository. If you wish to view the front end repository, you can find it [here](https://github.com/alicenstar/coin-tracker-3-api).*
+###### *This is the API repository. If you wish to view the front end repository, you can find it [here](https://github.com/alicenstar/coin-tracker-api).*
 ***
 #### Visit the site and create your own tracker [here](https://www.cointracker.me/), or view a demo tracker [here](https://www.cointracker.me/6046ee08e4fabe00153867e5).
 ***
